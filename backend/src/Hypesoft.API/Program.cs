@@ -7,6 +7,9 @@ using Serilog;
 using MediatR;
 using AutoMapper;
 using Hypesoft.Application.Mappings;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +24,25 @@ builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hypesoft API", Version = "v1" });
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter JWT Bearer token",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+    };
+    c.AddSecurityDefinition("Bearer", securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, new List<string>() }
+    });
+});
 
 // CORS
 builder.Services.AddCors(o =>
@@ -33,8 +54,10 @@ builder.Services.AddCors(o =>
         .SetIsOriginAllowed(_ => true));
 });
 
-// HealthChecks (Mongo will be added later via config)
-builder.Services.AddHealthChecks();
+// HealthChecks (Mongo)
+var mongoConn = builder.Configuration.GetSection("Mongo")["ConnectionString"] ?? "mongodb://localhost:27017";
+builder.Services.AddHealthChecks()
+    .AddMongoDb(mongoConn, name: "mongodb");
 
 // Authentication - Keycloak (placeholder config)
 var auth = builder.Configuration.GetSection("Auth");
@@ -60,6 +83,8 @@ builder.Services.AddRateLimiter(_ => { });
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(Hypesoft.Application.Queries.Products.ListProductsQuery).Assembly));
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Hypesoft.Application.Validators.ProductCreateDtoValidator>();
 
 var app = builder.Build();
 

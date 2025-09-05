@@ -2,6 +2,7 @@ using Hypesoft.Domain.Entities;
 using Hypesoft.Domain.Repositories;
 using Hypesoft.Infrastructure.Data;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Hypesoft.Infrastructure.Repositories;
 
