@@ -20,7 +20,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<PagedResult<ProductListItemDto>>> Get([FromQuery] string? search, [FromQuery] string? categoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var result = await _mediator.Send(new ListProductsQuery(search, categoryId, page, pageSize));
@@ -53,7 +53,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult> GetById(string id)
     {
         var product = await _mediator.Send(new GetProductByIdQuery(id));

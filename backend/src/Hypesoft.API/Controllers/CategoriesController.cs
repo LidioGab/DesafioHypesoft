@@ -17,7 +17,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<Category>>> Get()
         => Ok(await _repo.ListAsync());
 

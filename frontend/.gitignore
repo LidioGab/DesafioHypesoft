@@ -1,3 +1,5 @@
+# Local environment files
+.env
 # Logs
 logs
 *.log

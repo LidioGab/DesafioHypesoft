@@ -17,7 +17,7 @@ public class DashboardController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<DashboardResult>> Get()
         => Ok(await _mediator.Send(new GetDashboardQuery()));
 }
