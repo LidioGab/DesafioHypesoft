@@ -51,4 +51,13 @@ public class ProductsController : ControllerBase
         await _mediator.Send(new DeleteProductCommand(id));
         return NoContent();
     }
+
+    [HttpGet("{id}")]
+    [Authorize]
+    public async Task<ActionResult> GetById(string id)
+    {
+        var product = await _mediator.Send(new GetProductByIdQuery(id));
+        if (product is null) return NotFound();
+        return Ok(product);
+    }
 }
