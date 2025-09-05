@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Hypesoft.Infrastructure</AssemblyName>
+    <RootNamespace>Hypesoft.Infrastructure</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.27.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hypesoft.Application\Hypesoft.Application.csproj" />
+    <ProjectReference Include="..\Hypesoft.Domain\Hypesoft.Domain.csproj" />
+  </ItemGroup>
+</Project>

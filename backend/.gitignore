@@ -1,0 +1,33 @@
+# Build artifacts
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS/VSCode
+.vs/
+.vscode/
+*.code-workspace
+
+# Logs
+logs/
+*.log
+
+# Env
+.env
+
+# Coverage
+coverage/
+TestResults/
+
+# Docker
+**/Dockerfile
+**/.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
