@@ -233,6 +233,18 @@ docker-compose up -d
 docker-compose ps
 ```
 
+## Execução Rápida (este repo)
+
+```bash
+# Na raiz do repositório
+docker-compose up -d --build
+# Acessos
+# Frontend: http://localhost:3000
+# API: http://localhost:5000/swagger
+# Mongo Express: http://localhost:8081
+# Keycloak: http://localhost:8080
+```
+
 ### URLs de Acesso
 - **Frontend**: http://localhost:3000
 - **API**: http://localhost:5000

@@ -1,0 +1,53 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  mongo-express:
+    image: mongo-express:1.0.2
+    restart: unless-stopped
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.4
+    command: start-dev --http-port=8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8080:8080"
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - Mongo__ConnectionString=mongodb://mongo:27017
+      - Mongo__Database=hypesoft
+      - Auth__Authority=http://keycloak:8080/realms/hypesoft
+      - Auth__Audience=hypesoft-api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+      - keycloak
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    depends_on:
+      - api
+volumes:
+  mongo_data:
