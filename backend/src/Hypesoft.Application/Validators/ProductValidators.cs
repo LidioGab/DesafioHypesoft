@@ -20,7 +20,10 @@ public class ProductUpdateDtoValidator : AbstractValidator<ProductUpdateDto>
     public ProductUpdateDtoValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        Include(new ProductCreateDtoValidator());
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.Price).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.CategoryId).NotEmpty();
+        RuleFor(x => x.StockQuantity).GreaterThanOrEqualTo(0);
     }
 }
 

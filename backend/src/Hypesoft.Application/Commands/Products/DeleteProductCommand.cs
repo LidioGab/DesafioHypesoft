@@ -3,9 +3,9 @@ using MediatR;
 
 namespace Hypesoft.Application.Commands.Products;
 
-public record DeleteProductCommand(string Id) : IRequest;
+public record DeleteProductCommand(string Id) : IRequest<Unit>;
 
-public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
+public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, Unit>
 {
     private readonly IProductRepository _repo;
 
@@ -14,6 +14,9 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
         _repo = repo;
     }
 
-    public async Task Handle(DeleteProductCommand request, CancellationToken cancellationToken)
-        => await _repo.DeleteAsync(request.Id, cancellationToken);
+    public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+    {
+        await _repo.DeleteAsync(request.Id, cancellationToken);
+        return Unit.Value;
+    }
 }

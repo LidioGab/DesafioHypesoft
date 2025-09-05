@@ -1,4 +1,3 @@
-using HealthChecks.UI.Client;
 using Hypesoft.API.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -10,6 +9,7 @@ using Hypesoft.Application.Mappings;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,10 +54,8 @@ builder.Services.AddCors(o =>
         .SetIsOriginAllowed(_ => true));
 });
 
-// HealthChecks (Mongo)
-var mongoConn = builder.Configuration.GetSection("Mongo")["ConnectionString"] ?? "mongodb://localhost:27017";
-builder.Services.AddHealthChecks()
-    .AddMongoDb(mongoConn, name: "mongodb");
+// HealthChecks (basic)
+builder.Services.AddHealthChecks();
 
 // Authentication - Keycloak (placeholder config)
 var auth = builder.Configuration.GetSection("Auth");
@@ -81,7 +79,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Rate limiting (minimal)
 builder.Services.AddRateLimiter(_ => { });
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(Hypesoft.Application.Queries.Products.ListProductsQuery).Assembly));
+builder.Services.AddMediatR(typeof(Hypesoft.Application.Queries.Products.ListProductsQuery).Assembly);
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Hypesoft.Application.Validators.ProductCreateDtoValidator>();
@@ -101,7 +99,17 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var payload = new
+        {
+            status = report.Status.ToString(),
+            details = report.Entries.ToDictionary(k => k.Key, v => v.Value.Status.ToString()),
+            timestamp = DateTime.UtcNow
+        };
+        await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
+    }
 });
 
 app.MapControllers();
